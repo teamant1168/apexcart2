@@ -1,0 +1,205 @@
+<app-notification></app-notification>
+
+<div class="admin-dashboard">
+  <div class="container py-4">
+    <div class="dashboard-top mb-4">
+      <div>
+        <h2 class="mb-1">Admin Dashboard</h2>
+        <p class="text-muted mb-0">Create, edit and manage stock for products.</p>
+      </div>
+
+      <button class="btn btn-outline-dark" type="button" (click)="logout()">
+        Logout
+      </button>
+    </div>
+
+    <div class="row g-4">
+      <div class="col-xl-4">
+        <div class="admin-card form-card">
+          <h5 class="mb-3">{{ editingProductId === null ? 'Add Product' : 'Edit Product' }}</h5>
+
+          <form [formGroup]="productForm" (ngSubmit)="saveProduct()" novalidate>
+            <div class="mb-3">
+              <label class="form-label" for="name">Name</label>
+              <input id="name" class="form-control" type="text" formControlName="name">
+              @if (productForm.get('name')?.invalid && productForm.get('name')?.touched) {
+                <div class="invalid-msg">Product name is required.</div>
+              }
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label" for="description">Description</label>
+              <textarea id="description" rows="3" class="form-control" formControlName="description"></textarea>
+              @if (productForm.get('description')?.invalid && productForm.get('description')?.touched) {
+                <div class="invalid-msg">Description is required.</div>
+              }
+            </div>
+
+            <div class="row g-3">
+              <div class="col-md-4">
+                <label class="form-label" for="originalPrice">Price</label>
+                <input id="originalPrice" class="form-control" type="number" min="0.01" step="0.01" formControlName="originalPrice">
+              </div>
+
+              <div class="col-md-4">
+                <label class="form-label" for="stockQuantity">Stock Qty</label>
+                <input
+                  id="stockQuantity"
+                  class="form-control"
+                  type="number"
+                  [attr.min]="isOutOfStockSelected ? 0 : 1"
+                  formControlName="stockQuantity"
+                  [readonly]="isOutOfStockSelected">
+
+                @if (productForm.get('stockQuantity')?.invalid && productForm.get('stockQuantity')?.touched) {
+                  <div class="invalid-msg">
+                    @if (productForm.get('stockQuantity')?.errors?.['required']) {
+                      <div>Stock quantity is required.</div>
+                    }
+
+                    @if (productForm.get('stockQuantity')?.errors?.['min']) {
+                      <div>{{ isOutOfStockSelected ? 'Stock cannot be negative.' : 'Stock must be at least 1 when product is in stock.' }}</div>
+                    }
+                  </div>
+                }
+              </div>
+
+              <div class="col-md-4">
+                <label class="form-label" for="stockStatus">Stock Status</label>
+                <select id="stockStatus" class="form-select" formControlName="stockStatus" (change)="onStockStatusChange()">
+                  <option value="in">In Stock</option>
+                  <option value="out">Out of Stock</option>
+                </select>
+              </div>
+            </div>
+
+            @if (isOutOfStockSelected) {
+              <small class="text-muted d-block mt-2">Out of stock products are saved with quantity 0.</small>
+            }
+
+            <div class="row g-3 mt-1">
+              <div class="col-6">
+                <label class="form-label" for="discountPercentage">Discount %</label>
+                <input id="discountPercentage" class="form-control" type="number" min="0" step="0.01" formControlName="discountPercentage">
+              </div>
+              <div class="col-6">
+                <label class="form-label" for="discountAmount">Discount Amount</label>
+                <input id="discountAmount" class="form-control" type="number" min="0" step="0.01" formControlName="discountAmount">
+              </div>
+            </div>
+
+            <div class="mt-3">
+              <label class="form-label" for="category">Category</label>
+              <select id="category" class="form-select" formControlName="categoryId">
+                <option [ngValue]="null">Select category</option>
+                @for (category of categories; track category.id) {
+                  <option [ngValue]="category.id">{{ category.name }}</option>
+                }
+              </select>
+            </div>
+
+            <div class="mt-3">
+              <label class="form-label" for="brand">Brand</label>
+              <select id="brand" class="form-select" formControlName="brandId">
+                <option [ngValue]="null">Select brand</option>
+                @for (brand of brands; track brand.id) {
+                  <option [ngValue]="brand.id">{{ brand.name }}</option>
+                }
+              </select>
+            </div>
+
+            <div class="form-check mt-3">
+              <input class="form-check-input" id="isFeatured" type="checkbox" formControlName="isFeatured">
+              <label class="form-check-label" for="isFeatured">Featured product</label>
+            </div>
+
+            <div class="mt-3">
+              <label class="form-label" for="thumbnail">Thumbnail</label>
+              <input #thumbnailInput id="thumbnail" class="form-control" type="file" accept="image/*" (change)="onThumbnailSelected($event)">
+              @if (editingProductId === null) {
+                <small class="text-muted">Required while creating a product.</small>
+              }
+            </div>
+
+            <div class="d-flex gap-2 mt-4">
+              <button class="btn btn-success flex-fill" type="submit" [disabled]="isSaving">
+                {{ isSaving ? 'Saving...' : (editingProductId === null ? 'Add Product' : 'Update Product') }}
+              </button>
+
+              @if (editingProductId !== null) {
+                <button class="btn btn-outline-secondary" type="button" (click)="cancelEdit()">Cancel</button>
+              }
+            </div>
+          </form>
+        </div>
+      </div>
+
+      <div class="col-xl-8">
+        <div class="admin-card">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="mb-0">Products</h5>
+            <span class="badge text-bg-light">{{ products.length }} items</span>
+          </div>
+
+          @if (isLoadingProducts) {
+            <div class="text-center py-5 text-muted">Loading products...</div>
+          } @else {
+            <div class="table-responsive">
+              <table class="table align-middle table-hover">
+                <thead class="table-light">
+                  <tr>
+                    <th>Name</th>
+                    <th>Category</th>
+                    <th>Price</th>
+                    <th>Stock</th>
+                    <th class="text-end">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (product of products; track trackByProductId($index, product)) {
+                    <tr>
+                      <td>
+                        <div class="fw-semibold">{{ product.name }}</div>
+                        <small class="text-muted">{{ product.brand.name }}</small>
+                      </td>
+                      <td>{{ product.category.name }}</td>
+                      <td>{{ product.originalPrice | currency:'INR' }}</td>
+                      <td>
+                        <span class="badge" [ngClass]="product.inStock ? 'text-bg-success' : 'text-bg-secondary'">
+                          {{ product.inStock ? 'In Stock' : 'Out of Stock' }}
+                        </span>
+                      </td>
+                      <td class="text-end">
+                        <div class="action-buttons">
+                          <button class="btn btn-sm btn-outline-primary" type="button" (click)="editProduct(product)">
+                            Edit
+                          </button>
+                          <button
+                            class="btn btn-sm"
+                            [ngClass]="product.inStock ? 'btn-outline-warning' : 'btn-outline-success'"
+                            type="button"
+                            (click)="toggleStock(product)">
+                            {{ product.inStock ? 'Mark Out' : 'Mark In' }}
+                          </button>
+                          <button class="btn btn-sm btn-outline-danger" type="button" (click)="deleteProduct(product)">
+                            Delete
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  }
+
+                  @if (products.length === 0) {
+                    <tr>
+                      <td colspan="5" class="text-center py-4 text-muted">No products available.</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

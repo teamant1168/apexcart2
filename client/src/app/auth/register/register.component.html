@@ -1,0 +1,70 @@
+<app-notification></app-notification>
+<div class="register-container">
+  <div class="screen">
+    <div class="screen__content">
+      <form class="login" [formGroup]="RegistrationForm" (ngSubmit)="Register()">
+        <div class="login__field">
+          <i class="login__icon fas fa-user"></i>
+          <input type="text" name="username" class="login__input" formControlName="userName" placeholder="User name" autocomplete="off">
+          @if (RegistrationForm.get('userName')?.invalid && RegistrationForm.get('userName')?.dirty) {
+            <div class="invalid-msg">
+              @if (RegistrationForm.get('userName')?.errors?.['required']) {
+                <div>UserName is required.</div>
+              }
+            </div>
+          }
+        </div>
+        <div class="login__field">
+          <i class="login__icon fas fa-user"></i>
+          <input type="email" name="email" class="login__input" formControlName="email" placeholder="Email" autocomplete="off">
+          @if (RegistrationForm.get('email')?.invalid && RegistrationForm.get('email')?.dirty) {
+            <div class="invalid-msg">
+              @if (RegistrationForm.get('email')?.errors?.['required']) {
+                <div>Email is required.</div>
+              }
+              @if (RegistrationForm.get('email')?.errors?.['email']) {
+                <div>Invalid email</div>
+              }
+            </div>
+          }
+        </div>
+        <div class="login__field">
+          <i class="login__icon fas fa-lock"></i>
+          <input type="password" name="password" class="login__input" formControlName="password" placeholder="Password" autocomplete="off">
+          @if (RegistrationForm.get('password')?.invalid && RegistrationForm.get('password')?.dirty) {
+            <div class="invalid-msg">
+              @if (RegistrationForm.get('password')?.errors?.['required']) {
+                <span>Password is required.</span>
+              }
+            </div>
+          }
+        </div>
+        <div class="login__field">
+          <i class="login__icon fas fa-lock"></i>
+          <input type="password" name="confirmPassword" class="login__input" formControlName="confirmPassword" placeholder="Password">
+          @if (RegistrationForm.get('confirmPassword')?.invalid && RegistrationForm.get('confirmPassword')?.dirty) {
+            <div class="invalid-msg">
+              @if (RegistrationForm.get('confirmPassword')?.errors?.['passWordMismatch']) {
+                <span>Password do not match.</span>
+              }
+            </div>
+          }
+        </div>
+        <button class="button login__submit" type="submit" >
+          <span class="button__text">{{ isAdminRegistration ? 'Register Admin' : 'Register Now' }}</span>
+          <i class="button__icon fas fa-chevron-right"></i>
+        </button>
+        <button class="button login__submit" [routerLink]="[isAdminRegistration ? '/admin/login' : '/auth/login']" type="button" >
+          <span class="button__text">{{ isAdminRegistration ? 'Admin Login' : 'Log In Now' }}</span>
+          <i class="button__icon fas fa-chevron-right"></i>
+        </button>
+      </form>
+    </div>
+    <div class="screen__background">
+      <span class="screen__background__shape screen__background__shape4"></span>
+      <span class="screen__background__shape screen__background__shape3"></span>
+      <span class="screen__background__shape screen__background__shape2"></span>
+      <span class="screen__background__shape screen__background__shape1"></span>
+    </div>
+  </div>
+</div>

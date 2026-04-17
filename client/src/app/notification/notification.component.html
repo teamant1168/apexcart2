@@ -1,0 +1,37 @@
+<div class="notification-container">
+  @for (notification of notifications; track notification) {
+    <div
+      [ngClass]="'notification ' + notification.type"
+      >
+      @if (notification.type=='error') {
+        <mat-icon class="icon">
+          error
+        </mat-icon>
+      }
+      @if (notification.type=='warning') {
+        <mat-icon class="icon">
+          warning
+        </mat-icon>
+      }
+      @if (notification.type=='success') {
+        <mat-icon class="icon">
+          check_circle
+        </mat-icon>
+      }
+      @if (notification.type=='info') {
+        <mat-icon class="icon">
+          info
+        </mat-icon>
+      }
+      <div class="content">
+        <h4 class="title">{{notification.type}}</h4>
+        <div class="message">{{ notification.message }}</div>
+      </div>
+      <div class="close-btn" (click)="removeNotification(notification)">
+        <mat-icon >
+          close
+        </mat-icon>
+      </div>
+    </div>
+  }
+</div>

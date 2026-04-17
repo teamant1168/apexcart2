@@ -1,0 +1,19 @@
+<div class="pagination-container">
+  <button mat-icon-button (click)="onPageChange(currentPage-1)" [disabled]="currentPage===0">
+    <mat-icon>chevron_left</mat-icon>
+  </button>
+  @for (page of getPaginationArray(); track page) {
+    <button class="mat-page"
+      [class.mat-page-active]="currentPage===page" [disabled]="page===-1" (click)="onPageChange(page)">
+      @if (page!==-1) {
+        {{page+1}}
+      }
+      @if (page===-1) {
+        ...
+      }
+    </button>
+  }
+  <button mat-icon-button (click)="onPageChange(currentPage+1)" [disabled]="currentPage===totalPages-1">
+    <mat-icon>chevron_right</mat-icon>
+  </button>
+</div>

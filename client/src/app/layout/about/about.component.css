@@ -1,0 +1,49 @@
+.about-page {
+  background: linear-gradient(180deg, #fff7ef 0%, #ffffff 65%);
+}
+
+.about-card {
+  border: 1px solid #f0dfcf;
+  border-radius: 20px;
+  background: #ffffff;
+  box-shadow: 0 14px 28px rgba(24, 24, 24, 0.08);
+}
+
+.about-tag {
+  display: inline-block;
+  color: #8f4f14;
+  background-color: #fff1e3;
+  border-radius: 99px;
+  padding: 6px 12px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+}
+
+.about-title {
+  color: #202020;
+  font-weight: 700;
+}
+
+.about-copy {
+  color: #4f4f4f;
+  font-size: 1.05rem;
+  line-height: 1.65;
+  max-width: 900px;
+}
+
+.about-block {
+  border: 1px solid #f2ece5;
+  border-radius: 14px;
+  background: #fffdfa;
+}
+
+.about-block h3 {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #252525;
+}
+
+.about-block p {
+  color: #545454;
+  line-height: 1.5;
+}

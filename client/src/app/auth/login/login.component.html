@@ -1,0 +1,65 @@
+<app-notification></app-notification>
+<div class="login-container">
+  <div class="screen">
+    <div class="screen__content">
+      <form class="login" [formGroup]="loginForm" (ngSubmit)="Login()">
+        <div class="login__field">
+          <i class="login__icon fas fa-user"></i>
+          <input type="text" name="credential" class="login__input" formControlName="credential" placeholder="User name / Email" autocomplete="username">
+          @if (loginForm.get('credential')?.invalid && loginForm.get('credential')?.touched) {
+            <div class="invalid-msg">
+              @if (loginForm.get('credential')?.errors?.['required']) {
+                <div>Username or email is required.</div>
+              }
+            </div>
+          }
+        </div>
+        <div class="login__field">
+          <i class="login__icon fas fa-lock"></i>
+          <input type="password" name="password" class="login__input" formControlName="password" placeholder="Password" autocomplete="current-password">
+          @if (loginForm.get('password')?.invalid && loginForm.get('password')?.touched) {
+            <div class="invalid-msg">
+              @if (loginForm.get('password')?.errors?.['required']) {
+                <span>Password is required.</span>
+              }
+            </div>
+          }
+        </div>
+
+        @if (loginError) {
+          <div class="alert alert-danger py-2">{{ loginError }}</div>
+        }
+
+        <button class="button login__submit" [disabled]="isSubmitting" type="submit" >
+          @if (!isSubmitting) {
+            <span class="button__text">Log In Now</span>
+          } @else {
+            <span class="button__text">Signing in...</span>
+          }
+          <i class="button__icon fas fa-chevron-right"></i>
+        </button>
+
+        <button class="button login__submit" [routerLink]="['/auth/register']" type="button" >
+          <span class="button__text">Register New User</span>
+          <i class="button__icon fas fa-chevron-right"></i>
+        </button>
+
+        <button class="button login__submit" [routerLink]="['/admin/login']" type="button" >
+          <span class="button__text">Admin Login</span>
+          <i class="button__icon fas fa-chevron-right"></i>
+        </button>
+
+        <button class="button login__submit" [routerLink]="['/auth/register-admin']" type="button" >
+          <span class="button__text">Register Admin</span>
+          <i class="button__icon fas fa-chevron-right"></i>
+        </button>
+      </form>
+    </div>
+    <div class="screen__background">
+      <span class="screen__background__shape screen__background__shape4"></span>
+      <span class="screen__background__shape screen__background__shape3"></span>
+      <span class="screen__background__shape screen__background__shape2"></span>
+      <span class="screen__background__shape screen__background__shape1"></span>
+    </div>
+  </div>
+</div>

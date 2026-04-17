@@ -1,0 +1,46 @@
+<app-notification></app-notification>
+
+<div class="admin-login-page">
+  <div class="admin-login-card">
+    <h2 class="mb-2">Admin Login</h2>
+    <p class="text-muted mb-4">Sign in to manage products and stock.</p>
+
+    <form [formGroup]="loginForm" (ngSubmit)="login()" novalidate>
+      <div class="mb-3">
+        <label class="form-label" for="username">Username or Email</label>
+        <input id="username" type="text" class="form-control" formControlName="username" autocomplete="username" placeholder="Enter username or email">
+        @if (loginForm.get('username')?.invalid && loginForm.get('username')?.touched) {
+          <div class="invalid-msg">Username or email is required.</div>
+        }
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label" for="password">Password</label>
+        <input id="password" type="password" class="form-control" formControlName="password" autocomplete="current-password">
+        @if (loginForm.get('password')?.invalid && loginForm.get('password')?.touched) {
+          <div class="invalid-msg">Password is required.</div>
+        }
+      </div>
+
+      @if (loginError) {
+        <div class="alert alert-danger py-2">{{ loginError }}</div>
+      }
+
+      <button class="btn btn-success w-100 mt-2" [disabled]="isSubmitting" type="submit">
+        @if (!isSubmitting) {
+          <span>Login as Admin</span>
+        } @else {
+          <span>Signing in...</span>
+        }
+      </button>
+
+      <button class="btn btn-outline-primary w-100 mt-3" type="button" routerLink="/auth/register-admin">
+        Register Admin
+      </button>
+
+      <button class="btn btn-outline-secondary w-100 mt-3" type="button" routerLink="/auth/login">
+        User Login
+      </button>
+    </form>
+  </div>
+</div>

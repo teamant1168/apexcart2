@@ -1,0 +1,6 @@
+@for (star of [].constructor(rating); track star) {
+  <mat-icon class="rating-star">star</mat-icon>
+}
+@for (star of [].constructor(5 - rating); track star) {
+  <mat-icon class="rating-star">star_border</mat-icon>
+}

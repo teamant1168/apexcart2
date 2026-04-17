@@ -1,0 +1,26 @@
+:host {
+  display: block;
+}
+
+.admin-login-page {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: linear-gradient(135deg, #f3f6f9 0%, #dbe7f0 100%);
+}
+
+.admin-login-card {
+  width: 100%;
+  max-width: 420px;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 18px 45px rgba(33, 49, 60, 0.12);
+  padding: 28px;
+  border: 1px solid #e7edf2;
+}
+
+.admin-login-card h2 {
+  color: #21313c;
+}
