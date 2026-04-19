@@ -26,9 +26,10 @@
   </div>
   <div class="filter-section">
     <h3>Stock</h3>
-    <mat-button-toggle-group name="fontStyle" aria-label="Font Style" >
+    <mat-button-toggle-group name="stockFilter" [value]="selectedStockType" aria-label="Stock Filter">
+      <mat-button-toggle [value]="null" (change)="toggleStock(null)">All</mat-button-toggle>
       <mat-button-toggle [value]="true" (change)="toggleStock(true)">In-Stock</mat-button-toggle>
-      <mat-button-toggle [value]="false" (change)="toggleStock(false)">Out-Off-Stock</mat-button-toggle>
+      <mat-button-toggle [value]="false" (change)="toggleStock(false)">Out-Of-Stock</mat-button-toggle>
     </mat-button-toggle-group>
   </div>
 
@@ -36,7 +37,7 @@
   <div class="filter-section">
     <h3>Price</h3>
     <div class="filter-slider-container">
-      @if (minPrice && maxPrice) {
+      @if (maxPrice > 0) {
         <mat-slider class="filter-slider" [min]="minPrice" [max]="maxPrice">
           <input   matSliderStartThumb (dragEnd)="minPriceChange($event)">
           <input   matSliderEndThumb (dragEnd)="maxPriceChange($event)">

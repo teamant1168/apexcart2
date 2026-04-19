@@ -20,5 +20,12 @@ namespace server.Repository
                 .Include(b=>b.Image)
                 .ToListAsync();
         }
+
+        public async Task<Brand?> GetByName(string name)
+        {
+            var normalizedName = name.Trim().ToLower();
+            return await contex.brands
+                .FirstOrDefaultAsync(b => b.Name.ToLower() == normalizedName);
+        }
     }
 }

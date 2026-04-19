@@ -82,6 +82,16 @@ namespace server.Repository
                 }
             }
 
+            var totalCount = await productQuery.CountAsync();
+            decimal? minPrice = null;
+            decimal? maxPrice = null;
+
+            if (totalCount > 0)
+            {
+                minPrice = await productQuery.MinAsync(p => p.OriginalPrice);
+                maxPrice = await productQuery.MaxAsync(p => p.OriginalPrice);
+            }
+
 
             return new ProductPagination()
             {
@@ -91,9 +101,9 @@ namespace server.Repository
                             .Skip((inData.PageIndex - 1) * inData.PageSize)
                             .Take(inData.PageSize)
                             .ToListAsync(),
-                Count = await contex.products.CountAsync(),
-                MaxPrice = await contex.products.MaxAsync(p => p.OriginalPrice),
-                MinPrice = await contex.products.MinAsync(p => p.OriginalPrice),
+                Count = totalCount,
+                MaxPrice = maxPrice,
+                MinPrice = minPrice,
             };
 
 

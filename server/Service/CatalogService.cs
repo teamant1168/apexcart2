@@ -49,19 +49,19 @@ namespace server.Service
 
         public async Task<Product> CreateProduct(CreateProductReq inData)
         {
-            Category? category = await this.categoryRepository.GetByIdAsync(inData.CategoryId);
-            Brand? brand = await this.brandRepository.GetByIdAsync(inData.BrandId);
-
-            if (category == null) { throw new Exception($"Invalid Category Id {inData.CategoryId}"); };
-            if (brand == null) { throw new Exception($"Invalid Brand Id {inData.BrandId}"); };
+            Category category = await ResolveCategory(inData.CategoryId, inData.CategoryName);
+            Brand brand = await ResolveBrand(inData.BrandId, inData.BrandName);
 
             Image image = await this.imageService.SaveImageAsync(inData.Thumbnail);
 
             Product newProduct = mapper.Map<Product>(inData);
 
             newProduct.Brand = brand;
+            newProduct.BrandId = brand.Id;
             newProduct.Category = category;
+            newProduct.CategoryId = category.Id;
             newProduct.Thumbnail = image;
+            newProduct.ThumbnailId = image.Id;
 
            return await this.productRepository.AddAsync(newProduct);
         }
@@ -69,12 +69,10 @@ namespace server.Service
         public async Task<Product> UpdateProduct(int productId, UpdateProductReq inData)
         {
             Product? product = await productRepository.GetByIdAsync(productId);
-            Category? category = await categoryRepository.GetByIdAsync(inData.CategoryId);
-            Brand? brand = await brandRepository.GetByIdAsync(inData.BrandId);
+            Category category = await ResolveCategory(inData.CategoryId, inData.CategoryName);
+            Brand brand = await ResolveBrand(inData.BrandId, inData.BrandName);
 
             if (product == null) { throw new Exception($"Invalid Product Id {productId}"); }
-            if (category == null) { throw new Exception($"Invalid Category Id {inData.CategoryId}"); }
-            if (brand == null) { throw new Exception($"Invalid Brand Id {inData.BrandId}"); }
 
             product.Name = inData.Name;
             product.Description = inData.Description;
@@ -83,7 +81,9 @@ namespace server.Service
             product.DiscountAmount = inData.DiscountAmount;
             product.StockQuantity = inData.StockQuantity;
             product.IsFeatured = inData.IsFeatured;
+            product.Category = category;
             product.CategoryId = category.Id;
+            product.Brand = brand;
             product.BrandId = brand.Id;
 
             if (inData.Thumbnail != null)
@@ -99,6 +99,74 @@ namespace server.Service
             }
 
             return await productRepository.UpdateAsync(product);
+        }
+
+        private async Task<Category> ResolveCategory(int? categoryId, string? categoryName)
+        {
+            if (categoryId.HasValue && categoryId.Value > 0)
+            {
+                Category? existingById = await categoryRepository.GetByIdAsync(categoryId.Value);
+                if (existingById == null)
+                {
+                    throw new Exception($"Invalid Category Id {categoryId.Value}");
+                }
+
+                return existingById;
+            }
+
+            string normalizedName = NormalizeLookupName(categoryName, "Category");
+            Category? existingByName = await categoryRepository.GetByName(normalizedName);
+            if (existingByName != null)
+            {
+                return existingByName;
+            }
+
+            Category newCategory = new Category()
+            {
+                Name = normalizedName
+            };
+
+            return await categoryRepository.AddAsync(newCategory);
+        }
+
+        private async Task<Brand> ResolveBrand(int? brandId, string? brandName)
+        {
+            if (brandId.HasValue && brandId.Value > 0)
+            {
+                Brand? existingById = await brandRepository.GetByIdAsync(brandId.Value);
+                if (existingById == null)
+                {
+                    throw new Exception($"Invalid Brand Id {brandId.Value}");
+                }
+
+                return existingById;
+            }
+
+            string normalizedName = NormalizeLookupName(brandName, "Brand");
+            Brand? existingByName = await brandRepository.GetByName(normalizedName);
+            if (existingByName != null)
+            {
+                return existingByName;
+            }
+
+            Brand newBrand = new Brand()
+            {
+                Name = normalizedName
+            };
+
+            return await brandRepository.AddAsync(newBrand);
+        }
+
+        private static string NormalizeLookupName(string? value, string fieldName)
+        {
+            string normalized = value?.Trim() ?? "";
+
+            if (string.IsNullOrWhiteSpace(normalized))
+            {
+                throw new Exception($"{fieldName} is required.");
+            }
+
+            return normalized;
         }
 
         public async Task<Product> UpdateProductStockStatus(int productId, UpdateProductStockReq inData)

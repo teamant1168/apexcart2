@@ -11,8 +11,10 @@ namespace server.Dto
         public decimal? DiscountAmount { get; set; }
         public int StockQuantity { get; set; }
         public bool IsFeatured { get; set; } = false;
-        public int CategoryId { get; set; }
-        public int BrandId { get; set; }
+        public int? CategoryId { get; set; }
+        public int? BrandId { get; set; }
+        public string? CategoryName { get; set; }
+        public string? BrandName { get; set; }
         public IFormFile Thumbnail { get; set; }
     }
 
@@ -25,8 +27,10 @@ namespace server.Dto
         public decimal? DiscountAmount { get; set; }
         public int StockQuantity { get; set; }
         public bool IsFeatured { get; set; } = false;
-        public int CategoryId { get; set; }
-        public int BrandId { get; set; }
+        public int? CategoryId { get; set; }
+        public int? BrandId { get; set; }
+        public string? CategoryName { get; set; }
+        public string? BrandName { get; set; }
         public IFormFile? Thumbnail { get; set; }
     }
 

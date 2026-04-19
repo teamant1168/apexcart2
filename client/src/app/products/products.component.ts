@@ -1,12 +1,6 @@
-import { HttpClient } from '@angular/common/http';
-import { Component, OnInit } from '@angular/core';
-import { BrandResDto, CategoryResDto, ProductFilters, ProductResDto } from '../core/Models/catalog';
-import { ResponseDto } from '../core/Models/response';
-import { Store } from '@ngrx/store';
-import { AppState } from '../redux/store';
-import { selectBrands } from '../redux/catalog/catalog.selector';
-import { BehaviorSubject, Observable, tap } from 'rxjs';
-import { loadBrands } from '../redux/catalog/catalog.action';
+import { Component, HostListener, OnInit } from '@angular/core';
+import { BehaviorSubject } from 'rxjs';
+import { ProductFilters, ProductResDto } from '../core/Models/catalog';
 import { CatalogService } from '../core/Services/catalog.service';
 
 @Component({
@@ -18,19 +12,18 @@ import { CatalogService } from '../core/Services/catalog.service';
 export class ProductsComponent implements OnInit {
   products: ProductResDto[] = [];
   
-  pageIndex: number=0;
+  pageIndex: number=1;
   pageSize:number= 10;
   firstTimeloaded=false;
   pageItems!:number;
-  maxPrice!:number;
-  minPrice!:number;
+  maxPrice:number = 0;
+  minPrice:number = 0;
 
   constructor(private catalogService: CatalogService) { }
 
   ngOnInit(): void {
     this.filters$.subscribe((filter) => {
       this.catalogService.getProducts(filter).subscribe((res) => {
-        console.log(res);
         if(res.data?.count!=undefined){
           this.pageItems = res.data?.count;
         }
@@ -47,12 +40,18 @@ export class ProductsComponent implements OnInit {
     })
   }
 
+  @HostListener('window:focus')
+  onWindowFocus(): void {
+    this.filters$.next({ ...this.getFilters });
+  }
+
 
   
 
   initialFilters: ProductFilters = {
     pageIndex: 1,
-    pageSize: 10
+    pageSize: 10,
+    sort: 'newest'
   };
   filters$ = new BehaviorSubject<ProductFilters>(this.initialFilters);
   get getFilters(){
@@ -60,6 +59,7 @@ export class ProductsComponent implements OnInit {
   }
 
   display(pageIndex: number) {
+    this.pageIndex = pageIndex;
     this.initialFilters={
       ...this.initialFilters,
       pageIndex: pageIndex
@@ -67,8 +67,10 @@ export class ProductsComponent implements OnInit {
     this.filters$.next(this.initialFilters)
   }
   filtersChanged(filters: any) {
+    this.pageIndex = 1;
     this.initialFilters={
       ...this.initialFilters,
+      pageIndex: 1,
       categoryIds: filters.categoryId,
       brandIds: filters.brandId,
       ratings : filters.ratings,
@@ -81,8 +83,10 @@ export class ProductsComponent implements OnInit {
 
   sortFiltersChanged(sortFilters: any) {
     this.pageSize = sortFilters.itemsToShow;
+    this.pageIndex = 1;
     this.initialFilters={
       ...this.initialFilters,
+      pageIndex: 1,
       pageSize: sortFilters.itemsToShow,
       sort: sortFilters.sortBy
     }

@@ -33,7 +33,7 @@ export class SortHeaderComponent {
 ];
 
   @Input() itemsToShow:number=10;
-  @Input() sortBy: string = 'featured';
+  @Input() sortBy: string = 'newest';
 
   @Output() sortHeaderChanges = new EventEmitter<any>();
 

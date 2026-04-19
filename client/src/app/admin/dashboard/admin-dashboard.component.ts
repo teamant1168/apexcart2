@@ -1,10 +1,13 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { Store } from '@ngrx/store';
 import { FormBuilder, FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { BrandResDto, CategoryResDto, ProductResDto } from 'src/app/core/Models/catalog';
 import { AdminService } from 'src/app/core/Services/admin.service';
 import { AuthService } from 'src/app/core/Services/auth.service';
 import { CatalogService } from 'src/app/core/Services/catalog.service';
+import { loadBrands, loadCategories } from 'src/app/redux/catalog/catalog.action';
+import { AppState } from 'src/app/redux/store';
 import { NotificationService } from 'src/app/notification/notification.service';
 
 @Component({
@@ -31,7 +34,8 @@ export class AdminDashboardComponent implements OnInit {
     private adminService: AdminService,
     private authService: AuthService,
     private notificationService: NotificationService,
-    private router: Router
+    private router: Router,
+    private store: Store<AppState>
   ) {}
 
   ngOnInit(): void {
@@ -54,8 +58,8 @@ export class AdminDashboardComponent implements OnInit {
       stockQuantity: new FormControl<number | null>(1, [Validators.required, Validators.min(1)]),
       stockStatus: new FormControl<'in' | 'out'>('in', Validators.required),
       isFeatured: new FormControl(false),
-      categoryId: new FormControl<number | null>(null, [Validators.required, Validators.min(1)]),
-      brandId: new FormControl<number | null>(null, [Validators.required, Validators.min(1)]),
+      categoryName: new FormControl('', Validators.required),
+      brandName: new FormControl('', Validators.required),
       thumbnail: new FormControl<File | null>(null)
     });
 
@@ -156,6 +160,9 @@ export class AdminDashboardComponent implements OnInit {
 
         this.resetForm();
         this.loadProducts();
+        this.loadLookups();
+        this.store.dispatch(loadCategories());
+        this.store.dispatch(loadBrands());
       },
       error: () => {
         this.isSaving = false;
@@ -178,8 +185,8 @@ export class AdminDashboardComponent implements OnInit {
       stockQuantity: product.stockQuantity,
       stockStatus: product.inStock ? 'in' : 'out',
       isFeatured: product.isFeatured,
-      categoryId: product.category.id,
-      brandId: product.brand.id,
+      categoryName: product.category.name,
+      brandName: product.brand.name,
       thumbnail: null
     });
 
@@ -257,8 +264,8 @@ export class AdminDashboardComponent implements OnInit {
     const stockStatus = this.productForm.get('stockStatus')?.value;
     let stockQuantity = Number(this.productForm.get('stockQuantity')?.value ?? 0);
     const isFeatured = this.productForm.get('isFeatured')?.value === true;
-    const categoryId = Number(this.productForm.get('categoryId')?.value ?? 0);
-    const brandId = Number(this.productForm.get('brandId')?.value ?? 0);
+    const categoryName = (this.productForm.get('categoryName')?.value ?? '').trim();
+    const brandName = (this.productForm.get('brandName')?.value ?? '').trim();
     const thumbnail = this.productForm.get('thumbnail')?.value as File | null;
 
     if (stockStatus === 'out') {
@@ -272,8 +279,8 @@ export class AdminDashboardComponent implements OnInit {
     payload.append('originalPrice', String(originalPrice));
     payload.append('stockQuantity', String(stockQuantity));
     payload.append('isFeatured', String(isFeatured));
-    payload.append('categoryId', String(categoryId));
-    payload.append('brandId', String(brandId));
+    payload.append('categoryName', categoryName);
+    payload.append('brandName', brandName);
 
     if (discountPercentage !== null && discountPercentage !== undefined && String(discountPercentage) !== '') {
       payload.append('discountPercentage', String(discountPercentage));
@@ -301,8 +308,8 @@ export class AdminDashboardComponent implements OnInit {
       stockQuantity: 1,
       stockStatus: 'in',
       isFeatured: false,
-      categoryId: null,
-      brandId: null,
+      categoryName: '',
+      brandName: '',
       thumbnail: null
     });
 

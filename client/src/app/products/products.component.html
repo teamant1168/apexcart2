@@ -7,7 +7,10 @@
       (filtersChanged)="filtersChanged($event)"></app-filters>
     </div>
     <div class="col-9">
-      <app-sort-header (sortHeaderChanges)="sortFiltersChanged($event)"></app-sort-header>
+      <app-sort-header
+        [itemsToShow]="pageSize"
+        [sortBy]="getFilters.sort ?? 'newest'"
+        (sortHeaderChanges)="sortFiltersChanged($event)"></app-sort-header>
       <div class="product-grid-3 mt-5 mb-5">
         @for (p of products; track p) {
           <app-product-card [product]="p"></app-product-card>
@@ -18,4 +21,3 @@
     </div>
   </div>
 </div>
-
